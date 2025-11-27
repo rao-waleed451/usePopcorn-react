@@ -52,7 +52,7 @@ export default function MovieDetails({
       async function WatchedMoviesDetail() {
         setLoading(true);
         let res = await fetch(
-          `http://www.omdbapi.com/?apikey=${key}&i=${onSelected}`
+          `https://www.omdbapi.com/?apikey=${key}&i=${onSelected}`
         );
 
         let data = await res.json();
