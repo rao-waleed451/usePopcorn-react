@@ -1,33 +1,35 @@
 import Navbar from "./Navbar.js";
 import Main  from "./Main.js";
 import { useEffect, useState } from "react";
+import { useMovies } from "./useMovies.js";
+import { useLocalStorageState } from "./useLocalStorageState.js";
 
 
-const tempMovieData = [
-  {
-    imdbID: "tt1375666",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "tt0133093",
-    Title: "The Matrix",
-    Year: "1999",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
-  },
-  {
-    imdbID: "tt6751668",
-    Title: "Parasite",
-    Year: "2019",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
-  },
-];
+// const tempMovieData = [
+//   {
+//     imdbID: "tt1375666",
+//     Title: "Inception",
+//     Year: "2010",
+//     Poster:
+//       "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
+//   },
+//   {
+//     imdbID: "tt0133093",
+//     Title: "The Matrix",
+//     Year: "1999",
+//     Poster:
+//       "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
+//   },
+//   {
+//     imdbID: "tt6751668",
+//     Title: "Parasite",
+//     Year: "2019",
+//     Poster:
+//       "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_SX300.jpg",
+//   },
+// ];
 
-const tempWatchedData = [
+// const tempWatchedData = [
   // {
   //   imdbID: "tt1375666",
   //   Title: "Inception",
@@ -48,7 +50,7 @@ const tempWatchedData = [
   //   imdbRating: 8.5,
   //   userRating: 9,
   // },
-];
+// ];
 
 
 
@@ -59,72 +61,24 @@ const tempWatchedData = [
 const key = "96acaafe";
 
 function App() {
-  let [movies,setMovies]=useState([]);
+  
   let [query,setQuery]=useState("");
-  let [error,setError]=useState("");
-  let [isLoading,setIsLoading]=useState(false);
+  
   let [isSelected,setIsSelected]=useState(null);
-  let [watchedMovies,setWatchedMovies]=useState([])
+  let [watchedMovies,setWatchedMovies]=useLocalStorageState([],"watched")
 
   function HandleAddWatchMovies(movie){
       setWatchedMovies((curr)=>[...curr,movie])
   }
+ 
 
   function HandleCloseDetails(){
     setIsSelected(null)
   
 }
 
-useEffect(function (){
-  const controller=new AbortController();
-  async function fetchMovies() {
 
-
-    
-   
-
-
-      try{
-        setIsLoading(true)
-        setError("")
-         const apiUrl = `https://www.omdbapi.com/?apikey=${key}&s=${query}`;
-          // Wrap it with CORS proxy
-    const proxiedUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
-    
-    // Use the proxied URL
-    let res = await fetch(proxiedUrl, { signal: controller.signal });
-        //  let res=await fetch( `https://www.omdbapi.com/?apikey=${key}&s=${query}`,{signal:controller.signal});
-         if(res.status===500){
-          throw new Error("cors error")
-         }
-       if(!res.ok){
-           throw new Error("unable to fetch movies")
-       }
-       let data= await res.json();
-       setIsLoading(false)
-       
-       if(data.Response==="False"){
-            throw new Error("Movie not found")
-       }
-       setMovies(data.Search)
-      }catch(err){
-            setError(err.message); 
-      }finally{
-         setIsLoading(false)
-      }
-
-  }
-  if(query.length<3){
-    setMovies([]);
-    setError("");
-    return
-  }
-  HandleCloseDetails()
-  fetchMovies()
- 
- 
-},[query])
-
+ let [movies,error,isLoading]= useMovies(key,query)
 
 
   

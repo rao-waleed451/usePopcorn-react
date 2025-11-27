@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Loader } from "./App";
 import StarComponent from "./StarComponent";
+import { useKey } from "./useKey";
 export default function MovieDetails({
   onHandleCloseDetails,
   onIsSelected,
@@ -44,21 +45,8 @@ export default function MovieDetails({
     onHandleCloseDetails();
     onAddWatchedMovies(newWatchedMovie);
   }
-  useEffect(
-    function (e) {
-      function callback(e) {
-        if (e.key === "Escape") {
-          onHandleCloseDetails();
-        }
-      }
-      document.addEventListener("keydown", callback);
-
-      return () => {
-        document.removeEventListener("keydown", callback);
-      };
-    },
-    [onHandleCloseDetails]
-  );
+    
+  useKey("Escape",onHandleCloseDetails)
   useEffect(
     function () {
       async function WatchedMoviesDetail() {
